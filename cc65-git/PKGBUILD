@@ -1,0 +1,79 @@
+pkgname=cc65-git
+pkgver=666
+pkgrel=1
+pkgdesc="C compiler for 6502 family microprocessors"
+depends=()
+arch=('i686' 'x86_64')
+license=('custom')
+url="http://www.cc65.org/"
+makedepends=("wget" "linuxdoc-tools")
+source=()
+
+# the needful for rpmsplice
+_bindir="/usr/bin"
+_libdir="usr/lib"
+
+_gitzip="https://github.com/oliverschmidt/cc65/archive/master.zip"
+_filename="cc65-master"
+
+build() {
+	msg "Download Latest master from github server..."
+	wget ${_gitzip} -O ${_filename}.zip
+        unzip ${_filename}.zip
+	cd $srcdir/${_filename} || return 1
+    
+	make || return 1
+    
+}
+
+package() {
+
+mkdir -p $pkgdir{$_bindir,$_libdir/cc65/{asminc,cfg,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,obj,ser,tgi}}
+	
+cd $srcdir/${_filename} || return 1
+
+# Taken direct from RPM spec:
+# ftp://ftp.musoftware.de/pub/uz/cc65/RedHat/cc65.spec
+
+# Binaries
+install -s -m 755 bin/ar65 $pkgdir$_bindir
+install -s -m 755 bin/ca65 $pkgdir$_bindir
+install    -m 755 src/ca65html/ca65html $pkgdir$_bindir
+install -s -m 755 bin/cc65 $pkgdir$_bindir
+install -s -m 755 bin/cl65 $pkgdir$_bindir
+install -s -m 755 bin/co65 $pkgdir$_bindir
+install -s -m 755 bin/da65 $pkgdir$_bindir
+install -s -m 755 bin/grc65 $pkgdir$_bindir
+install -s -m 755 bin/ld65 $pkgdir$_bindir
+install -s -m 755 bin/od65 $pkgdir$_bindir
+
+# Libraries and includes
+install -m 644 lib/*.lib $pkgdir$_libdir/cc65/lib
+install -m 644 include/*.h $pkgdir$_libdir/cc65/include
+install -m 644 include/geos/*.h $pkgdir$_libdir/cc65/include/geos
+install -m 644 include/em/*.h $pkgdir$_libdir/cc65/include/em
+install -m 644 include/joystick/*.h $pkgdir$_libdir/cc65/include/joystick
+install -m 644 include/mouse/*.h $pkgdir$_libdir/cc65/include/mouse
+install -m 644 include/sys/*.h $pkgdir$_libdir/cc65/include/sys
+install -m 644 include/tgi/*.h $pkgdir$_libdir/cc65/include/tgi
+install -m 644 asminc/*.inc $pkgdir$_libdir/cc65/asminc
+
+# Extra object files
+for extra in wrk/*/*.o; do
+    install -m 644 ${extra} $pkgdir$_libdir/cc65/obj
+done
+
+# Additional linker configurations
+install -m 644 cfg/*.cfg $pkgdir$_libdir/cc65/cfg
+
+# Drivers
+install -m 644 emd/*.emd $pkgdir$_libdir/cc65/emd
+install -m 644 joy/*.joy $pkgdir$_libdir/cc65/joy
+install -m 644 mou/*.mou $pkgdir$_libdir/cc65/mou
+install -m 644 ser/*.ser $pkgdir$_libdir/cc65/ser
+install -m 644 tgi/*.tgi $pkgdir$_libdir/cc65/tgi
+
+mkdir -p $pkgdir/usr/share/licenses/$pkgname/
+cp $srcdir/$_filename/LICENSE $pkgdir/usr/share/licenses/$pkgname/
+}
+
