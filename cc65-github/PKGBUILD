@@ -1,8 +1,10 @@
-pkgname=cc65-git
+# Maintained by Jim Gorz <nrezinorn@gmail.com>
+pkgname=cc65-github
 pkgver=666
 pkgrel=1
 pkgdesc="C compiler for 6502 family microprocessors"
 depends=()
+conflicts=('cc65' 'cc65-svn')
 arch=('i686' 'x86_64')
 license=('custom')
 url="http://www.cc65.org/"
