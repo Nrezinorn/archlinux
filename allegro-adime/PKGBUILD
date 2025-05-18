@@ -1,0 +1,32 @@
+# Maintainer: Jguer <pkgbuilds at jguer.space>
+pkgname=adime
+pkgver=2.2.1
+pkgrel=1
+pkgdesc="Adime is a portable add-on library for Allegro with functions for generating Allegro dialogs in a very simple way"
+arch=('x86_64')
+url="https://adime.sourceforge.net/"
+license=('zlib')
+depends=(
+  'pacman>6.1'
+  'wget'
+  'allegro4'
+)
+makedepends=(
+  'allegro4'
+)
+source=("http://prdownloads.sourceforge.net/adime/adime-${pkgver}.tar.gz?download")
+sha256sums=('48268a07f3751e4540cfa6e601f86318a4db9f1fde3630ea11e3ed8539b50fa5')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  ./fix.sh unix
+  # Patch Makefile for unix
+  sed -i '127s/^.*$/OFLAGS = -O2 -funroll-loops -ffast-math -fPIC/' misc/makefile.uni
+  make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  echo "package here"
+  make SYSTEM_DIR="$pkgdir/usr" install
+}
