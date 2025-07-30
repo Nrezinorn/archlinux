@@ -1,0 +1,33 @@
+pkgname=cmangos-wotlk-git
+pkgver=0.18
+pkgrel=1
+pkgdesc="C(ontinued)-MaNGOS is about: -- Doing WoW-Emulation Right!"
+arch=('x86_64')
+url="https://github.com/cmangos/mangos-wotlk"
+license=('GPLv2')
+depends=(
+  'git'
+  'base-devel'
+  'gcc'
+  'boost'
+  'mariadb-libs'
+)
+makedepends=(
+  'cmake'
+)
+source=("https://github.com/cmangos/mangos-wotlk/archive/refs/heads/master.zip")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/mangos-wotlk-master"
+  mkdir build
+  pushd build
+  cmake -DCMAKE_INSTALL_PREFIX=$pkgdir/opt/cmangos-wotlk -DBUILD_EXTRACTORS=1 -DBUILD_AHBOT=1 -DCMAKE_POLICY_VERSION_MINIMUM=3.5  ..
+  make -j$(nproc)
+  popd
+}
+
+package() {
+  cd "$srcdir/mangos-wotlk-master/build"
+  make install
+}
